@@ -7,4 +7,9 @@
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Interfaces\" />
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

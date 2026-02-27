@@ -1,0 +1,48 @@
+﻿@page "/leaderboard"
+<PageTitle>Leaderboard</PageTitle>
+
+<h3>Guitar Hero III - Leaderboard</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Song</th>
+            <th>Difficulty</th>
+            <th>Score</th>
+            <th>Stars</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in LeaderboardEntries)
+        {
+            <tr>
+                <td>@entry.Rank</td>
+                <td>@entry.Player</td>
+                <td>@entry.Song</td>
+                <td>@entry.Difficulty</td>
+                <td>@entry.Score.ToString("N0")</td>
+                <td>@entry.Stars ⭐</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<LeaderboardEntry> LeaderboardEntries = new()
+    {
+        new(1,  "SlashFan99",    "Through the Fire and Flames", "Expert", 987450, 5),
+        new(2,  "GuitarLegend",  "Raining Blood",               "Expert", 854320, 5),
+        new(3,  "AxeShredder",   "One",                         "Expert", 812100, 5),
+        new(4,  "RockGod42",     "Before I Forget",             "Expert",   775600, 4),
+        new(5,  "NeckBreaker",   "Knights of Cydonia",          "Expert", 741800, 4),
+        new(6,  "SixStringHero", "The Metal",                   "Expert",   698450, 4),
+        new(7,  "FretBurner",    "Cult of Personality",         "Expert", 653200, 4),
+        new(8,  "PowerChord",    "Slow Ride",                   "Expert", 612750, 3),
+        new(9,  "WhamBarWizard", "Sabotage",                    "Expert",   589300, 3),
+        new(10, "NoteTapper",    "Welcome to the Jungle",       "Expert", 541100, 3),
+    };
+
+    private record LeaderboardEntry(int Rank, string Player, string Song, string Difficulty, int Score, int Stars);
+}
