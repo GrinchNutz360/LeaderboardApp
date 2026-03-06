@@ -5,15 +5,9 @@
     },
     "sqlite1": {
       "secretStore": "LocalSecretsFile",
+      "resourceId": null,
       "type": "sqlite.local",
-      "connectionId": "ConnectionStrings:API_KEY",
-      "dynamicId": null
-    },
-    "mssql1": {
-      "secretStore": "LocalSecretsFile",
-      "type": "mssql.local",
-      "connectionId": "ConnectionStrings:DefaultConnection",
-      "dynamicId": null
+      "connectionId": "ConnectionStrings:API_KEY"
     }
   }
 }
