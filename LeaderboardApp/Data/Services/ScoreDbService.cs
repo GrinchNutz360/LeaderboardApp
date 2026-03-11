@@ -5,34 +5,39 @@ namespace LeaderboardApp.Data.Services
 {
     public class ScoreDbService : IScoreable
     {
-        public ScoreDbContext context { get; set; }
+        private readonly ScoreDbContext _context;
+
+        public ScoreDbService(ScoreDbContext context)
+        {
+            _context = context;
+        }
+
         public void AddScore(Scores score)
         {
-            context.Scores.Add(score);
-            context.SaveChanges();
+            _context.Scores.Add(score);
+            _context.SaveChanges();
         }
 
         public IEnumerable<Scores> GetAllScores()
         {
-            return context.Scores;
+            return _context.Scores;
         }
 
         public IEnumerable<Songs> GetAllSongs()
         {
-            return context.Songs;
+            return _context.Songs;
         }
 
         public IEnumerable<Users> GetAllUsers()
         {
-            return context.Users;
+            return _context.Users;
         }
 
         public Scores? RemoveScore(int id)
         {
-            Scores selected = GetAllScores().FirstOrDefault(dih => dih.ID == id)!;
-            context.Remove(selected);
-            context.SaveChanges();
-
+            Scores selected = GetAllScores().FirstOrDefault(s => s.ScoreID == id)!;
+            _context.Remove(selected);
+            _context.SaveChanges();
             return selected;
         }
     }

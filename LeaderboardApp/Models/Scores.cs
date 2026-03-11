@@ -5,23 +5,17 @@ namespace LeaderboardApp.Models
 {
     public class Scores
     {
-        public int ID { get; set; }
-        [Required]
+        [Key]
+        public int ScoreID { get; set; }
         public int Score { get; set; }
 
-        // foreign key values
-        [ForeignKey(nameof(Songs.ID))]
+        [ForeignKey("Songs")]
         public int SongID { get; set; }
-        [ForeignKey(nameof(Users.Id))]
-        public int UserId { get; set; }
 
-        // navigation properties
-        [Required]
+        [ForeignKey("Users")]
+        public int UsersId { get; set; }
+
         public Users Users { get; set; } = null!;
-        [Required]
         public Songs Songs { get; set; } = null!;
-
-
-
     }
 }

@@ -1,7 +1,16 @@
 ﻿@page "/leaderboard"
-<PageTitle>Leaderboard</PageTitle>
+@rendermode InteractiveServer
+@inject ScoreDbContext Db
+@inject AppState AppState
+@inject NavigationManager Nav
+@using LeaderboardApp.Data
+@using LeaderboardApp.Models
+@using Microsoft.EntityFrameworkCore
 
+<PageTitle>Leaderboard</PageTitle>
 <h3>Guitar Hero III - Leaderboard</h3>
+
+<button @onclick="HandleAdd">Add Score</button>
 
 <table class="table">
     <thead>
@@ -9,40 +18,162 @@
             <th>Rank</th>
             <th>Player</th>
             <th>Song</th>
-            <th>Difficulty</th>
             <th>Score</th>
-            <th>Stars</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var entry in LeaderboardEntries)
+        @foreach (var (entry, index) in LeaderboardEntries.Select((e, i) => (e, i)))
         {
             <tr>
-                <td>@entry.Rank</td>
-                <td>@entry.Player</td>
-                <td>@entry.Song</td>
-                <td>@entry.Difficulty</td>
+                <td>@(index + 1)</td>
+                <td>@entry.Users.Username</td>
+                <td>@entry.Songs.SongName</td>
                 <td>@entry.Score.ToString("N0")</td>
-                <td>@entry.Stars ⭐</td>
+                <td>
+                    <button @onclick="() => HandleEdit(entry)">Edit</button>
+                    <button @onclick="() => HandleDelete(entry)">Delete</button>
+                </td>
             </tr>
         }
     </tbody>
 </table>
 
-@code {
-    private List<LeaderboardEntry> LeaderboardEntries = new()
-    {
-        new(1,  "SlashFan99",    "Through the Fire and Flames", "Expert", 987450, 5),
-        new(2,  "GuitarLegend",  "Raining Blood",               "Expert", 854320, 5),
-        new(3,  "AxeShredder",   "One",                         "Expert", 812100, 5),
-        new(4,  "RockGod42",     "Before I Forget",             "Expert",   775600, 4),
-        new(5,  "NeckBreaker",   "Knights of Cydonia",          "Expert", 741800, 4),
-        new(6,  "SixStringHero", "The Metal",                   "Expert",   698450, 4),
-        new(7,  "FretBurner",    "Cult of Personality",         "Expert", 653200, 4),
-        new(8,  "PowerChord",    "Slow Ride",                   "Expert", 612750, 3),
-        new(9,  "WhamBarWizard", "Sabotage",                    "Expert",   589300, 3),
-        new(10, "NoteTapper",    "Welcome to the Jungle",       "Expert", 541100, 3),
-    };
+@if (showForm)
+{
+    <div>
+        <h4>@(editingEntry == null ? "Add Score" : "Edit Score")</h4>
+        <select @bind="selectedSongId">
+            <option value="0">-- Select Song --</option>
+            @foreach (var song in Songs)
+            {
+                <option value="@song.SongID">@song.SongName</option>
+            }
+        </select>
+        <input placeholder="Score" type="number" @bind="scoreValue" />
+        <button @onclick="HandleSave">Save</button>
+        <button @onclick="() => showForm = false">Cancel</button>
+        @if (!string.IsNullOrEmpty(formError))
+        {
+            <p style="color:red">@formError</p>
+        }
+    </div>
+}
 
-    private record LeaderboardEntry(int Rank, string Player, string Song, string Difficulty, int Score, int Stars);
+@code {
+    private List<Scores> LeaderboardEntries = new();
+    private List<Songs> Songs = new();
+    private bool showForm = false;
+    private Scores? editingEntry = null;
+    private int selectedSongId = 0;
+    private int scoreValue = 0;
+    private string formError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        if (!Db.Songs.Any())
+        {
+            Db.Songs.AddRange(
+                new Songs { SongName = "Through the Fire and Flames" },
+                new Songs { SongName = "Raining Blood" },
+                new Songs { SongName = "One" },
+                new Songs { SongName = "Slow Ride" },
+                new Songs { SongName = "Sabotage" }
+            );
+            await Db.SaveChangesAsync();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        LeaderboardEntries = await Db.Scores
+            .Include(s => s.Users)
+            .Include(s => s.Songs)
+            .OrderByDescending(s => s.Score)
+            .ToListAsync();
+
+        Songs = await Db.Songs.ToListAsync();
+    }
+
+    private void HandleAdd()
+    {
+        if (!AppState.IsLoggedIn)
+        {
+            Nav.NavigateTo("/user-settings");
+            return;
+        }
+        editingEntry = null;
+        selectedSongId = 0;
+        scoreValue = 0;
+        formError = "";
+        showForm = true;
+    }
+
+    private void HandleEdit(Scores entry)
+    {
+        if (!AppState.IsLoggedIn) 
+        {
+            Nav.NavigateTo("/user-settings");
+            return;
+        }
+        if (!AppState.IsAdmin && entry.UsersId != AppState.CurrentUser!.Id)
+        {
+            formError = "You can only edit your own scores.";
+            return;
+        }
+        editingEntry = entry;
+        selectedSongId = entry.SongID;
+        scoreValue = entry.Score;
+        formError = "";
+        showForm = true;
+    }
+
+    private async Task HandleDelete(Scores entry)
+    {
+        if (!AppState.IsLoggedIn)
+        {
+            Nav.NavigateTo("/user-settings");
+            return;
+        }
+        if (!AppState.IsAdmin && entry.UsersId != AppState.CurrentUser!.Id)
+        {
+            formError = "You can only delete your own scores.";
+            return;
+        }
+        Db.Scores.Remove(entry);
+        await Db.SaveChangesAsync();
+        await LoadData();
+    }
+
+    private async Task HandleSave()
+    {
+        Console.WriteLine($"SongID: {selectedSongId}, Score: {scoreValue}, UsersId: {AppState.CurrentUser!.Id}");
+        if (selectedSongId == 0 || scoreValue <= 0)
+        {
+            formError = "Please select a song and enter a valid score.";
+            return;
+        }
+        if (editingEntry == null)
+        {
+            // Adding new score
+            var newScore = new Scores
+            {
+                UsersId = AppState.CurrentUser!.Id,
+                SongID = selectedSongId,
+                Score = scoreValue
+            };
+            Db.Scores.Add(newScore);
+        }
+        else
+        {
+            // Editing existing score
+            editingEntry.SongID = selectedSongId;
+            editingEntry.Score = scoreValue;
+            Db.Scores.Update(editingEntry);
+        }
+        await Db.SaveChangesAsync();
+        showForm = false;
+        await LoadData();
+    }
 }

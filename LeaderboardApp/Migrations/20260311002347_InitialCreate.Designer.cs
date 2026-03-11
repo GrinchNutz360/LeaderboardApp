@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LeaderboardApp.Migrations
 {
     [DbContext(typeof(ScoreDbContext))]
-    [Migration("20260306233453_InitialCreate")]
+    [Migration("20260311002347_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace LeaderboardApp.Migrations
 
             modelBuilder.Entity("LeaderboardApp.Models.Scores", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("ScoreID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -31,18 +31,12 @@ namespace LeaderboardApp.Migrations
                     b.Property<int>("SongID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SongsID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("UsersId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ID");
+                    b.HasKey("ScoreID");
 
-                    b.HasIndex("SongsID");
+                    b.HasIndex("SongID");
 
                     b.HasIndex("UsersId");
 
@@ -51,7 +45,7 @@ namespace LeaderboardApp.Migrations
 
             modelBuilder.Entity("LeaderboardApp.Models.Songs", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("SongID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -59,7 +53,7 @@ namespace LeaderboardApp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("ID");
+                    b.HasKey("SongID");
 
                     b.ToTable("Songs");
                 });
@@ -69,6 +63,18 @@ namespace LeaderboardApp.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -83,7 +89,7 @@ namespace LeaderboardApp.Migrations
                 {
                     b.HasOne("LeaderboardApp.Models.Songs", "Songs")
                         .WithMany()
-                        .HasForeignKey("SongsID")
+                        .HasForeignKey("SongID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

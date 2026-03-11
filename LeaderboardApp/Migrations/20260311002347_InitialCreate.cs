@@ -14,13 +14,13 @@ namespace LeaderboardApp.Migrations
                 name: "Songs",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                    SongID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     SongName = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Songs", x => x.ID);
+                    table.PrimaryKey("PK_Songs", x => x.SongID);
                 });
 
             migrationBuilder.CreateTable(
@@ -29,7 +29,10 @@ namespace LeaderboardApp.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Username = table.Column<string>(type: "TEXT", nullable: false)
+                    Username = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Password = table.Column<string>(type: "TEXT", nullable: false),
+                    Role = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -40,22 +43,20 @@ namespace LeaderboardApp.Migrations
                 name: "Scores",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                    ScoreID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Score = table.Column<int>(type: "INTEGER", nullable: false),
                     SongID = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    UsersId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SongsID = table.Column<int>(type: "INTEGER", nullable: false)
+                    UsersId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Scores", x => x.ID);
+                    table.PrimaryKey("PK_Scores", x => x.ScoreID);
                     table.ForeignKey(
-                        name: "FK_Scores_Songs_SongsID",
-                        column: x => x.SongsID,
+                        name: "FK_Scores_Songs_SongID",
+                        column: x => x.SongID,
                         principalTable: "Songs",
-                        principalColumn: "ID",
+                        principalColumn: "SongID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Scores_Users_UsersId",
@@ -66,9 +67,9 @@ namespace LeaderboardApp.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Scores_SongsID",
+                name: "IX_Scores_SongID",
                 table: "Scores",
-                column: "SongsID");
+                column: "SongID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Scores_UsersId",

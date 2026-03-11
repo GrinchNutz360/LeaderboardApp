@@ -5,8 +5,8 @@ namespace LeaderboardApp.Models
 {
     public class Songs
     {
-        
-        public int ID { get; set; }
+        [Key]
+        public int SongID { get; set; }
         [Required]
         public required string SongName { get; set; }
         [NotMapped]

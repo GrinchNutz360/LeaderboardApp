@@ -19,6 +19,7 @@ builder.Services.AddDbContext<ScoreDbContext>(options =>
 );
 builder.Services.AddScoped<AuthServiceable>();
 builder.Services.AddSingleton<AppState>();
+builder.Services.AddScoped<ScoreDbService>();
 
 var app = builder.Build();
 
