@@ -59,4 +59,8 @@ h1:focus {
     text-align: start;
 }
 
-/*OUR CODE*/
+/*OUR CODE th, td, tr, body {
+    outline: 1px solid;
+    outline-color: navy !important;
+    background-color: papayawhip !important;
+}*/

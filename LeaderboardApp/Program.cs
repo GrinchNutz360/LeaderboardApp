@@ -13,7 +13,7 @@ builder.Services.AddRazorComponents()
 string? connectionString = builder.Configuration.GetConnectionString("API_KEY");
 
 builder.Services.AddScoped<IScoreable, ScoreDbService>();
-
+Console.WriteLine(builder.Configuration.GetConnectionString("API_KEY"));
 builder.Services.AddDbContext<ScoreDbContext>(options =>
     options.UseSqlite(connectionString)
 );
