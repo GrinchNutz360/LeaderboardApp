@@ -18,12 +18,12 @@
         @foreach (var entry in LeaderboardEntries)
         {
             <tr>
-                <td>@entry.Rank</td>
-                <td>@entry.Player</td>
-                <td>@entry.Song</td>
-                <td>@entry.Difficulty</td>
-                <td>@entry.Score.ToString("N0")</td>
-                <td>@entry.Stars ⭐</td>
+                <td class="td">@entry.Rank</td>
+                <td class="td">@entry.Player</td>
+                <td class="td">@entry.Song</td>
+                <td class="td">@entry.Difficulty</td>
+                <td class="td">@entry.Score.ToString("N0")</td>
+                <td class="td">@entry.Stars ⭐</td>
             </tr>
         }
     </tbody>
